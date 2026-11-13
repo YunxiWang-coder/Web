@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Message</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, sans-serif;
+        }
+        nav{
+            background-color:#238b45;
+            text-align:center;
+            padding:14px 0;
+        }
+        nav a{
+            color:white;
+            text-decoration:none;
+            margin:0 12px;
+            font-size:16px;
+        }
+        nav a:hover{
+            text-decoration:underline;
+        }
+        body{
+            background-color:#e8f8dd;
+        }
+        .container{
+            width:700px;
+            margin:40px auto;
+            padding:20px;
+        }
+        h2{
+            color:#238b45;
+            border-left:4px solid #238b45;
+            padding-left:10px;
+            margin-bottom:25px;
+        }
+        .form-box{
+            background:#fff;
+            padding:30px;
+            border-radius:8px;
+            margin-bottom:30px;
+        }
+        .item{
+            margin-bottom:18px;
+        }
+        label{
+            display:block;
+            margin-bottom:6px;
+            color:#333;
+        }
+        input,textarea{
+            width:100%;
+            padding:10px;
+            border:1px solid #ccc;
+            border-radius:4px;
+            font-size:15px;
+        }
+        textarea{
+            height:140px;
+            resize:none;
+        }
+        button{
+            background-color:#238b45;
+            color:white;
+            border:none;
+            padding:11px 26px;
+            border-radius:5px;
+            cursor:pointer;
+            font-size:16px;
+        }
+        button:hover{
+            background:#196b34;
+        }
+        .msg-item{
+            background:#fff;
+            padding:16px;
+            border-radius:8px;
+            margin-bottom:14px;
+        }
+        .msg-name{
+            color:#238b45;
+            font-weight:bold;
+        }
+        .msg-time{
+            color:#888;
+            font-size:13px;
+            margin-bottom:8px;
+        }
+        /* 邮箱样式 */
+        .contact-email{
+            margin-top:35px;
+            padding-top:20px;
+            border-top:1px solid #ccc;
+            color:#444;
+            text-align:center;
+        }
+        .contact-email a{
+            color:#238b45;
+            text-decoration:none;
+        }
+        .contact-email a:hover{
+            text-decoration:underline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home Page</a>
+        <a href="delicacies.html">Delicacies</a>
+        <a href="scenic.html">Scenic Spots</a>
+        <a href="guide.html">Travel Guide</a>
+        <a href="message.html">Message</a>
+    </nav>
+
+    <div class="container">
+        <h2>Message Board 留言板</h2>
+        <div class="form-box">
+            <div class="item">
+                <label>Your Name 你的名字 *</label>
+                <input type="text" id="name" placeholder="Please enter your name">
+            </div>
+            <div class="item">
+                <label>Your Email 邮箱</label>
+                <input type="email" id="email" placeholder="Please enter your email">
+            </div>
+            <div class="item">
+                <label>Your Message 留言内容 *</label>
+                <textarea id="content" placeholder="Share your travel experience about Shandong..."></textarea>
+            </div>
+            <button id="submitBtn">Send an email to me.</button>
+        </div>
+
+
+        <!-- 这里是你的邮箱，中英对照 -->
+        <div class="contact-email">
+            <p>Contact me / 联系我：<a href="mailto:3112390193@qq.com">3112390193@qq.com</a></p>
+        </div>
+    </div>
+
+    <script>
+        const api = "/api/messages";
+        async function loadMessages() {
+            const res = await fetch(api);
+            const list = await res.json();
+            const wrap = document.getElementById("msgList");
+            wrap.innerHTML = "";
+            list.forEach(item => {
+                wrap.innerHTML += `
+                <div class="msg-item">
+                    <div class="msg-name">${item.name}</div>
+                    <div class="msg-time">${item.time}</div>
+                    <div>${item.content}</div>
+                </div>`
+            })
+        }
+        loadMessages();
+
+        document.getElementById("submitBtn").onclick = async () => {
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const content = document.getElementById("content").value.trim();
+            const res = await fetch(api, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, content })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            if (data.ok) {
+                document.getElementById("name").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("content").value = "";
+                loadMessages();
+            }
+        }
+    </script>
+</body>
+</html>
